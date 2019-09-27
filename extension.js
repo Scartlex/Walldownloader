@@ -37,37 +37,24 @@ function GET(url) {
     return request.response_body.data;
 }
 
-class Provider {
-    constructor() {
-    }
-
-    GET() {
-        let request = Soup.Message.new('GET', url);
-        session.send_message(request);
-        return request.response_body.data;
-    }
-
-}
-
 class NasaAPOD {
     download() {
         return JSON.parse(GET('https://api.nasa.gov/planetary/apod?api_key=G5iCAZRDIuK8yLfi2p7C643gWAPHhf657MzW0G0x')).hdurl;
     }
 }
 
-class Wallhaven extends Provider {
-    constructor(props) {
-        super(props)
+class Wallhaven {
+    constructor() {
         this.apikey = 'cOxYxXJvBihaSADxwys3CBmqI7gk6Fh8';
         this.ratios = '16x9';
         this.atLeast = '1920x1080';
         this.sorting = 'random';
-        this.categories = '111';
-        this.purity = '100';
+        this.categories = '010';//General/Anime/People
+        this.purity = '100';//SFW/Sketchy/NSFW
     }
 
     download() {
-        return JSON.parse(this.GET(`https://wallhaven.cc/api/v1/search?apikey=${this.apikey}&ratios=${this.ratios}&atLeast=${this.atLeast}&sorting=${this.sorting}&categories=${this.categories}&purity=${this.purity}`)).data[0].path;
+        return JSON.parse(GET(`https://wallhaven.cc/api/v1/search?apikey=${this.apikey}&ratios=${this.ratios}&atLeast=${this.atLeast}&sorting=${this.sorting}&categories=${this.categories}&purity=${this.purity}`)).data[0].path;
     }
 }
 
@@ -78,11 +65,6 @@ function changeWallpaper() {
     const imgUrl = wallhaven.download();
     backgroundSettings.set_string('picture-uri', imgUrl);
     Gio.Settings.sync();
-}
-
-function debugAndChange() {
-    _showHello('Hello');
-    changeWallpaper();
 }
 
 function _hideHello() {
@@ -125,7 +107,7 @@ function init() {
                              style_class: 'system-status-icon' });
 
     button.set_child(icon);
-    button.connect('button-press-event', debugAndChange);
+    button.connect('button-press-event', changeWallpaper);
 }
 
 let wallpaperInterval;
